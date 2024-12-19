@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Inflation Chart</title>
+</head>
+<body>
+  <body>    
+    <div>
+      <canvas id="myChart"></canvas>
+    </div>
+    <script>
+      const ctx = document.getElementById('myChart');
+
+      async function getData() {
+        const response = await fetch("US_CPI.csv");
+        const data = await response.text();
+        const rows = data.split("\n").slice(1);
+        const year = []
+        const CPI = []
+        rows.forEach((elem) => {
+            const row = elem.split(",");
+            const myYear = row[0].split("-")[2]
+            if (year.indexOf(myYear) === -1) {
+              year.push(myYear)
+              CPI.push(row[1])
+            }
+          });
+        console.log(year)
+        console.log(CPI)
+        return [year, CPI]
+      }
+
+      async function makeChart(yearArr, CPIArr) {
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: yearArr,
+            datasets: [{
+              label: 'Consumer Price Index in the U.S. from 1913-2021',
+              data: CPIArr,
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: false
+              }
+            }
+          }
+        })
+      }
+
+      getData().then(text => {
+        makeChart(text[0], text[1])
+      })
+    </script>
+ </body>
+</body>
+</html>
